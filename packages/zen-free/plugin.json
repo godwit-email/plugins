@@ -1,0 +1,12 @@
+{
+  "name": "zen-free",
+  "version": "0.1.0",
+  "main": "index.js",
+  "description": {
+    "default": "Free OpenCode Zen models. Prompts, context and tools are sent to a third-party service through an unofficial interface.",
+    "zh-Hans": "OpenCode Zen 免费模型。提示、上下文与工具会通过非官方接口发送到第三方服务。"
+  },
+  "capabilities": ["models"],
+  "permissions": { "net": ["opencode.ai", "models.opencode.ai", "raw.githubusercontent.com"] },
+  "config": []
+}

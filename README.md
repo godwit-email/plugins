@@ -21,12 +21,16 @@ The plugins [Godwit](https://github.com/godwit-email/godwit)'s Extensions page o
 
 ## Adding a plugin or a release
 
+In-repository script plugins live under `packages/`, including [Zen Free](packages/zen-free).
+One **Plugins** workflow discovers and checks all packages and publishes a selected plugin
+on manual dispatch. **Publish** separately validates, signs, and uploads the registry.
+
 Open a pull request that adds to `plugins` (or to an existing plugin's `releases`):
 
 ```json
 {
   "name": "example",
-  "title": { "default": "Example", "zh-CN": "示例" },
+  "title": { "default": "Example", "zh-Hans": "示例" },
   "summary": { "default": "Translates mail with an example service. Sends the text to example.com." },
   "homepage": "https://github.com/someone/godwit-example",
   "releases": [
@@ -49,6 +53,31 @@ Open a pull request that adds to `plugins` (or to an existing plugin's `releases
 - A script release has one file, `any`: the plugin bundled into the single `.js` file its
   `manifest.main` names, at most 5 MiB.
 - Bump the top-level `updated` (RFC 3339) in every pull request.
+
+## Building and releasing script plugins
+
+Each `packages/<name>/` contains `plugin.json` and `package.json`, whose scripts provide
+`typecheck`, `test`, and `build`. The directory name must match the manifest name. Builds
+write `dist/plugin.json` and a bundled `dist/index.js`. New packages join the shared CI
+without adding a workflow.
+
+1. Release a Godwit version supporting model plugins; its release publishes the matching
+   `@godwit/sdk` version.
+2. Bump `packages/<name>/package.json` and `plugin.json` together and merge to main.
+3. Create and push `<name>-vX.Y.Z` for that main commit.
+4. Run **Actions → Plugins → Run workflow** on main, supplying the plugin name, tag, and actual
+   minimum released Godwit version. The workflow checks the tagged source, installs the
+   published SDK, and publishes `index.js`, `plugin.json`, `<name>.tar.gz`,
+   `registry-plugin.json`, and `SHA256SUMS` to GitHub Releases.
+5. Add the released `registry-plugin.json` entry to `registry.json`, or merge its release
+   into the existing entry while preserving older releases. Bump `updated` and open a PR.
+   **Publish** validates the real downloads, signs, and uploads the registry.
+
+PR checks provide a `<name>-dist` artifact. They pack the SDK from the pinned Godwit
+commit used by the goja integration test; update that pin when updating the SDK/API.
+Release runs require `contents: write`. If a failed run leaves a draft release, inspect
+and delete that unpublished draft before retrying. Never replace published files; bump
+the version instead. The workflow does not modify the registry.
 
 ## Review checklist
 
