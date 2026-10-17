@@ -21,6 +21,11 @@ The plugins [Godwit](https://github.com/godwit-email/godwit)'s Extensions page o
 
 ## Adding a plugin or a release
 
+Zen Free source lives in [`packages/zen-free`](packages/zen-free). Its **Zen Free** workflow
+checks and builds the plugin, and publishes GitHub Release files on manual dispatch; see
+the maintainer steps below. The **Publish** workflow
+separately validates, signs, and uploads the registry after a registry change is merged.
+
 Open a pull request that adds to `plugins` (or to an existing plugin's `releases`):
 
 ```json
@@ -49,6 +54,25 @@ Open a pull request that adds to `plugins` (or to an existing plugin's `releases
 - A script release has one file, `any`: the plugin bundled into the single `.js` file its
   `manifest.main` names, at most 5 MiB.
 - Bump the top-level `updated` (RFC 3339) in every pull request.
+
+## Releasing Zen Free
+
+1. Publish the required `@godwit/sdk` package and a Godwit version supporting model plugins.
+2. Bump `packages/zen-free/package.json` and `plugin.json` together and merge to main.
+3. Create and push `zen-free-vX.Y.Z` for that main commit.
+4. Run **Actions → Zen Free → Run workflow** on main, supplying the tag and the actual
+   minimum released Godwit version. The workflow checks the tagged source, installs the
+   published SDK, and publishes `index.js`, `plugin.json`, `zen-free.tar.gz`,
+   `registry-plugin.json`, and `SHA256SUMS` to GitHub Releases.
+5. Add the released `registry-plugin.json` entry to `registry.json`, or merge its release
+   into the existing entry while preserving older releases. Bump `updated` and open a PR.
+   **Publish** validates the real downloads, signs, and uploads the registry.
+
+PR checks provide a `zen-free-dist` artifact. They pack the SDK from the pinned Godwit
+commit used by the goja integration test; update that pin when updating the SDK/API.
+Release runs require `contents: write`. If a failed run leaves a draft release, inspect
+and delete that unpublished draft before retrying. Never replace published files; bump
+the version instead. The workflow does not modify the registry.
 
 ## Review checklist
 
