@@ -1,6 +1,6 @@
 import {expect,test} from "bun:test"
 import type {JSONValue} from "@godwit/sdk"
-import {adaptZenRequest,sessionID} from "../src/request"
+import {adaptZenRequest,sessionID} from "./request"
 for(const protocol of ["openai-completions","openai-responses","anthropic-message"]){test(protocol+" preserves real tools and input",()=>{
  const real:JSONValue=protocol==="openai-completions"?{type:"function",function:{name:"read",parameters:{type:"object",properties:{path:{type:"string"}}}}}:protocol==="anthropic-message"?{name:"read",input_schema:{type:"object"}}:{type:"function",name:"read",parameters:{type:"object"}}
  const call={model:{id:"free",name:"Free",transport:"http",protocol,baseURL:"https://opencode.ai/inference/v1"},sessionId:"random-host-session",sessionCreatedAt:1792240000000,requestId:"attempt-one",request:{url:"ignored",headers:{"Authorization":"Bearer secret"},body:{model:"free",stream:true,tools:[real]}}} as any

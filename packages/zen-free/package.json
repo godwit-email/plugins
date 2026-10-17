@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "scripts": { "build": "bun run build.ts", "test": "bun test test", "typecheck": "tsc --noEmit" },
+  "scripts": { "build": "bun run build.ts", "test": "bun test", "typecheck": "tsc --noEmit" },
   "devDependencies": {
     "@godwit/sdk": "0.1.0",
     "@types/bun": "1.4.3",

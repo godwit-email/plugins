@@ -7,5 +7,5 @@
     "moduleResolution": "Bundler",
     "types": ["bun"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "../../scripts/**/*.ts", "build.ts"]
+  "include": ["src/**/*.ts", "../../scripts/**/*.ts", "*.ts"]
 }

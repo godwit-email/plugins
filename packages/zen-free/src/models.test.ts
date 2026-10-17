@@ -1,5 +1,5 @@
 import {describe,expect,test} from "bun:test"
-import {buildModels,discoverFreeModels,parseDocs} from "../src/models"
+import {buildModels,discoverFreeModels,parseDocs} from "./models"
 const docs=`| Name | Model | Endpoint | SDK |
 | Free | free | \`https://opencode.ai/inference/openai/v1/responses\` | sdk |
 | Pickle | pickle | \`https://opencode.ai/inference/openai/v1/chat/completions\` | sdk |
