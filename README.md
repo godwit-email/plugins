@@ -61,7 +61,8 @@ Each `packages/<name>/` contains `plugin.json` and `package.json`, whose scripts
 write `dist/plugin.json` and a bundled `dist/index.js`. New packages join the shared CI
 without adding a workflow.
 
-1. Publish the required `@godwit/sdk` package and a Godwit version supporting model plugins.
+1. Release a Godwit version supporting model plugins; its release publishes the matching
+   `@godwit/sdk` version.
 2. Bump `packages/<name>/package.json` and `plugin.json` together and merge to main.
 3. Create and push `<name>-vX.Y.Z` for that main commit.
 4. Run **Actions → Plugins → Run workflow** on main, supplying the plugin name, tag, and actual

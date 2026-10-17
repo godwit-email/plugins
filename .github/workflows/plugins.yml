@@ -77,7 +77,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: godwit-email/godwit
-          ref: 4cacafebc431de5d9fd1bfbb7d8528dcef47b6f7
+          ref: 38816d38824c69f4bccff5a9e636f81e5483d60f
           path: .godwit-ci
       - uses: actions/setup-go@v5
         with:
@@ -101,9 +101,8 @@ jobs:
         working-directory: packages/${{ matrix.plugin }}
         run: |
           # shortcut: pack the pinned SDK until its first npm publication; no sibling imports.
-          (cd "$GODWIT_CHECKOUT/sdk" && bun pm pack --ignore-scripts --destination "$RUNNER_TEMP")
-          sdk_version=$(bun -p 'require("./package.json").devDependencies["@godwit/sdk"]')
-          bun add --dev --no-save --ignore-scripts "@godwit/sdk@file:$RUNNER_TEMP/godwit-sdk-$sdk_version.tgz"
+          (cd "$GODWIT_CHECKOUT/sdk" && bun pm pack --ignore-scripts --filename "$RUNNER_TEMP/godwit-sdk.tgz")
+          bun add --dev --no-save --ignore-scripts "@godwit/sdk@file:$RUNNER_TEMP/godwit-sdk.tgz"
       - run: bun run --bun typecheck
         working-directory: packages/${{ matrix.plugin }}
       - run: bun test scripts
