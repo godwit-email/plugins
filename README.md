@@ -30,7 +30,7 @@ Open a pull request that adds to `plugins` (or to an existing plugin's `releases
 ```json
 {
   "name": "example",
-  "title": { "default": "Example", "zh-CN": "示例" },
+  "title": { "default": "Example", "zh-Hans": "示例" },
   "summary": { "default": "Translates mail with an example service. Sends the text to example.com." },
   "homepage": "https://github.com/someone/godwit-example",
   "releases": [
