@@ -83,30 +83,33 @@ jobs:
         with:
           go-version-file: .godwit-ci/go.mod
           cache-dependency-path: .godwit-ci/go.sum
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.3
+      - name: Install host frontend dependencies for code generation
+        working-directory: .godwit-ci/web
+        run: bun install --frozen-lockfile
+      - name: Generate host bindings and catalogs for integration tests
+        working-directory: .godwit-ci
+        run: go tool mygo generate
       - name: Install published SDK for releases
         if: github.event_name == 'workflow_dispatch'
         working-directory: packages/${{ matrix.plugin }}
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: bun install --no-save --ignore-scripts
       - name: Install packed SDK for source checks
         if: github.event_name != 'workflow_dispatch'
         working-directory: packages/${{ matrix.plugin }}
         run: |
           # shortcut: pack the pinned SDK until its first npm publication; no sibling imports.
-          (cd "$GODWIT_CHECKOUT/sdk" && npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP")
-          sdk_version=$(node -p 'require("./package.json").devDependencies["@godwit/sdk"]')
-          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund "$RUNNER_TEMP/godwit-sdk-$sdk_version.tgz"
-      - run: npm run typecheck
+          (cd "$GODWIT_CHECKOUT/sdk" && bun pm pack --ignore-scripts --destination "$RUNNER_TEMP")
+          sdk_version=$(bun -p 'require("./package.json").devDependencies["@godwit/sdk"]')
+          bun add --dev --no-save --ignore-scripts "@godwit/sdk@file:$RUNNER_TEMP/godwit-sdk-$sdk_version.tgz"
+      - run: bun run --bun typecheck
         working-directory: packages/${{ matrix.plugin }}
       - run: bun test scripts
-      - run: npm test
+      - run: bun run --bun test
         working-directory: packages/${{ matrix.plugin }}
-      - run: npm run build
+      - run: bun run --bun build
         working-directory: packages/${{ matrix.plugin }}
       - name: Prepare release metadata and archive
         if: github.event_name == 'workflow_dispatch'

@@ -1,5 +1,5 @@
 {
-  "name": "godwit-zen-free",
+  "name": "@godwit/plugin-zen-free",
   "version": "0.1.0",
   "private": true,
   "type": "module",
