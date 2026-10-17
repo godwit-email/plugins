@@ -1,0 +1,5 @@
+const result = await Bun.build({ entrypoints: [import.meta.dir + "/src/index.ts"], outdir: import.meta.dir + "/dist", target: "browser", format: "esm", minify: false, external: [] })
+if (!result.success) throw new AggregateError(result.logs, "Zen Free build failed")
+await Bun.write(import.meta.dir + "/dist/plugin.json", Bun.file(import.meta.dir + "/plugin.json"))
+await Bun.write(import.meta.dir + "/dist/LICENSE", Bun.file(import.meta.dir + "/LICENSE"))
+if (Bun.file(import.meta.dir + "/dist/index.js").size > 5 * 1024 * 1024) throw new Error("Plugin is larger than the host limit")
