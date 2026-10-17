@@ -1,4 +1,4 @@
-import type { Ctx } from "../../../godwit/sdk/godwit"
+import type { Ctx } from "@godwit/sdk"
 import { discoverFreeModels } from "./models"
 import { adaptZenRequest } from "./request"
 

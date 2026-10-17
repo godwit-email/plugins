@@ -1,4 +1,4 @@
-import type { ModelHTTPRequest, PrepareModelRequest } from "../../../godwit/sdk/godwit"
+import type { ModelHTTPRequest, PrepareModelRequest } from "@godwit/sdk"
 import { BASE } from "./models"
 
 const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"

@@ -13,22 +13,39 @@
 源码无运行时依赖，Bun 仅用于构建和测试：
 
 ```sh
-bun run --cwd zen-free build
-bun test ./zen-free/test
+bun run --cwd packages/zen-free build
+bun test ./packages/zen-free/test
 ```
 
-安装 `zen-free/dist`。它包含 `plugin.json` 和一份无外部 import 的 `index.js`。
+安装 `packages/zen-free/dist`。它包含 `plugin.json` 和一份无外部 import 的 `index.js`。
 
-源码类型导入指向相邻的 `godwit/sdk/godwit.d.ts`。运行真实 goja 沙箱测试时指定宿主工作树：
+源码从 npm 包 `@godwit/sdk` 导入类型，不要求相邻的 Godwit 仓库。首次安装及类型检查：
 
 ```sh
-PATH=/path/to/go/bin:$PATH GODWIT_CHECKOUT=/path/to/godwit bun test ./zen-free/test
+cd packages/zen-free
+npm install
+npm run typecheck
+```
+
+`@godwit/sdk@0.1.0` 首次发布前，可用主仓打出的真实 npm 包验证，不修改依赖声明：
+
+```sh
+# 在主仓 sdk/ 执行 npm pack --pack-destination /tmp
+# 然后在 packages/zen-free/ 执行：
+npm install --no-save --package-lock=false /tmp/godwit-sdk-0.1.0.tgz
+npm run typecheck
+```
+
+SDK 发布之前，直接从 npm 安装会失败；应先合入并发布宿主 SDK，再合入本插件。运行真实 goja 沙箱测试时指定宿主工作树：
+
+```sh
+PATH=/path/to/go/bin:$PATH GODWIT_CHECKOUT=/path/to/godwit bun test ./packages/zen-free/test
 ```
 
 可选的真实接口验收仅发送公共测试文字，工具只返回固定测试值：
 
 ```sh
-GODWIT_ZEN_FREE_DIST=/absolute/path/to/plugins/zen-free/dist \
+GODWIT_ZEN_FREE_DIST=/absolute/path/to/plugins/packages/zen-free/dist \
 GODWIT_ZEN_LIVE=1 go test ./core -run '^TestZenFreeLive$' -count=1 -v
 ```
 
