@@ -1,4 +1,7 @@
-import type { Ctx, HTTPModel, ModelProtocol } from "@godwit/sdk"
+import type { Ctx, Model } from "@godwit/sdk"
+
+export type HTTPModel = Extract<Model, { transport: "http" }>
+export type ModelProtocol = HTTPModel["protocol"]
 
 export const BASE = "https://opencode.ai/inference/v1"
 const CATALOG = "https://models.opencode.ai/api.json"

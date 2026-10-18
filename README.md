@@ -61,8 +61,8 @@ Each `packages/<name>/` contains `plugin.json` and `package.json`, whose scripts
 write `dist/plugin.json` and a bundled `dist/index.js`. New packages join the shared CI
 without adding a workflow.
 
-1. Release a Godwit version supporting model plugins; its release publishes the matching
-   `@godwit/sdk` version.
+1. Release Godwit 1.7.0 or later with model plugin support; its release publishes the matching
+   `@godwit/sdk` version. The published 1.6.0 SDK predates the model API.
 2. Bump `packages/<name>/package.json` and `plugin.json` together and merge to main.
 3. Create and push `<name>-vX.Y.Z` for that main commit.
 4. Run **Actions → Plugins → Run workflow** on main, supplying the plugin name, tag, and actual
@@ -73,8 +73,9 @@ without adding a workflow.
    into the existing entry while preserving older releases. Bump `updated` and open a PR.
    **Publish** validates the real downloads, signs, and uploads the registry.
 
-PR checks provide a `<name>-dist` artifact. They pack the SDK from the pinned Godwit
-commit used by the goja integration test; update that pin when updating the SDK/API.
+PR checks provide a `<name>-dist` artifact. Until the model API's SDK is published, they
+pack it from the pinned Godwit commit used by the goja integration test. Release runs
+install the published SDK from npm. Update the host pin when updating the SDK/API.
 Release runs require `contents: write`. If a failed run leaves a draft release, inspect
 and delete that unpublished draft before retrying. Never replace published files; bump
 the version instead. The workflow does not modify the registry.
