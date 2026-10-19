@@ -1,0 +1,146 @@
+name: Plugins
+
+on:
+  pull_request:
+    paths: ["packages/**", "scripts/**", ".github/workflows/plugins.yml"]
+  push:
+    branches: [main]
+    paths: ["packages/**", "scripts/**", ".github/workflows/plugins.yml"]
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: Plugin directory name under packages, e.g. zen-free
+        required: true
+      tag:
+        description: Existing plugin tag on main, e.g. zen-free-v0.1.0
+        required: true
+      min_godwit:
+        description: First released Godwit version supporting this plugin, e.g. 1.7.0
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  packages:
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.discover.outputs.plugins }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.sha }}
+      - id: discover
+        env:
+          REQUESTED_PLUGIN: ${{ inputs.plugin }}
+          IS_RELEASE: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib, re
+          names = []
+          for manifest in sorted(pathlib.Path("packages").glob("*/plugin.json")):
+              name = manifest.parent.name
+              if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name):
+                  raise SystemExit(f"Invalid plugin directory: {name}")
+              if json.loads(manifest.read_text())["name"] != name or not (manifest.parent / "package.json").is_file():
+                  raise SystemExit(f"Invalid plugin package: {name}")
+              names.append(name)
+          if os.environ["IS_RELEASE"] == "true":
+              requested = os.environ["REQUESTED_PLUGIN"]
+              if requested not in names:
+                  raise SystemExit("Requested plugin does not exist")
+              names = [requested]
+          if not names:
+              raise SystemExit("No plugin packages found")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write("plugins=" + json.dumps(names) + "\n")
+          PY
+
+  check:
+    needs: packages
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJSON(needs.packages.outputs.plugins) }}
+    runs-on: ubuntu-latest
+    env:
+      GODWIT_CHECKOUT: ${{ github.workspace }}/.godwit-ci
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.sha }}
+          fetch-depth: 0
+      - name: Require a tagged commit from main for releases
+        if: github.event_name == 'workflow_dispatch'
+        run: git merge-base --is-ancestor HEAD origin/main
+      # Pin the host/API used by the real goja integration test.
+      - uses: actions/checkout@v4
+        with:
+          repository: godwit-email/godwit
+          ref: 95eb0180654353e4e0a026a33258d6f9f0c6fb54
+          path: .godwit-ci
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .godwit-ci/go.mod
+          cache-dependency-path: .godwit-ci/go.sum
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - name: Install published SDK for releases
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: packages/${{ matrix.plugin }}
+        run: bun install --no-save --ignore-scripts
+      - name: Install packed SDK for source checks
+        if: github.event_name != 'workflow_dispatch'
+        working-directory: packages/${{ matrix.plugin }}
+        run: |
+          # shortcut: model types ship in the next SDK release; use the pinned API until then.
+          (cd "$GODWIT_CHECKOUT/sdk" && bun pm pack --ignore-scripts --filename "$RUNNER_TEMP/godwit-sdk.tgz")
+          bun add --dev --no-save --ignore-scripts "@godwit/sdk@file:$RUNNER_TEMP/godwit-sdk.tgz"
+      - run: bun run --bun typecheck
+        working-directory: packages/${{ matrix.plugin }}
+      - run: bun test scripts
+      - run: bun run --bun test
+        working-directory: packages/${{ matrix.plugin }}
+      - run: bun run --bun build
+        working-directory: packages/${{ matrix.plugin }}
+      - name: Prepare release metadata and archive
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PLUGIN: ${{ matrix.plugin }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          MIN_GODWIT: ${{ inputs.min_godwit }}
+        run: |
+          bun scripts/release.ts "$PLUGIN" "$RELEASE_TAG" "$MIN_GODWIT"
+          cd "packages/$PLUGIN/dist"
+          tar -czf "$PLUGIN.tar.gz" index.js plugin.json
+          sha256sum index.js plugin.json "$PLUGIN.tar.gz" registry-plugin.json > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.plugin }}-dist
+          path: packages/${{ matrix.plugin }}/dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    needs: check
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.plugin }}-dist
+          path: dist
+      - name: Publish the verified release files
+        env:
+          PLUGIN: ${{ inputs.plugin }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          MIN_GODWIT: ${{ inputs.min_godwit }}
+        run: |
+          gh release create "$RELEASE_TAG" dist/index.js dist/plugin.json "dist/$PLUGIN.tar.gz" dist/registry-plugin.json dist/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "$RELEASE_TAG" \
+            --notes "Requires Godwit $MIN_GODWIT or later. Extract $PLUGIN.tar.gz for manual installation. registry-plugin.json contains the registry entry and exact index.js checksum."
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false
