@@ -27,7 +27,7 @@ jobs:
     outputs:
       plugins: ${{ steps.discover.outputs.plugins }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.sha }}
       - id: discover
@@ -66,7 +66,7 @@ jobs:
     env:
       GODWIT_CHECKOUT: ${{ github.workspace }}/.godwit-ci
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.sha }}
           fetch-depth: 0
@@ -74,12 +74,12 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: git merge-base --is-ancestor HEAD origin/main
       # Pin the host/API used by the real goja integration test.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: godwit-email/godwit
           ref: 95eb0180654353e4e0a026a33258d6f9f0c6fb54
           path: .godwit-ci
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: .godwit-ci/go.mod
           cache-dependency-path: .godwit-ci/go.sum
@@ -115,7 +115,7 @@ jobs:
           cd "packages/$PLUGIN/dist"
           tar -czf "$PLUGIN.tar.gz" index.js plugin.json
           sha256sum index.js plugin.json "$PLUGIN.tar.gz" registry-plugin.json > SHA256SUMS
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.plugin }}-dist
           path: packages/${{ matrix.plugin }}/dist/
@@ -129,7 +129,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.plugin }}-dist
           path: dist
