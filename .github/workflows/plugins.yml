@@ -73,11 +73,11 @@ jobs:
       - name: Require a tagged commit from main for releases
         if: github.event_name == 'workflow_dispatch'
         run: git merge-base --is-ancestor HEAD origin/main
-      # Pin the host/API used by the real goja integration test.
+      # Pin the host/API used by the real sandbox integration test.
       - uses: actions/checkout@v7
         with:
           repository: godwit-email/godwit
-          ref: 95eb0180654353e4e0a026a33258d6f9f0c6fb54
+          ref: 40cad22278abd39582db8effdbbd41b613e614f5
           path: .godwit-ci
       - uses: actions/setup-go@v7
         with:
@@ -86,17 +86,14 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.3
-      - name: Install published SDK for releases
-        if: github.event_name == 'workflow_dispatch'
+      # core/plugins imports internal/i18n, whose catalog_gen.go is generated and not committed.
+      - name: Generate the pinned host's sources
+        run: |
+          (cd "$GODWIT_CHECKOUT/web" && bun install --frozen-lockfile)
+          cd "$GODWIT_CHECKOUT" && go tool mygo generate
+      - name: Install published SDK
         working-directory: packages/${{ matrix.plugin }}
         run: bun install --no-save --ignore-scripts
-      - name: Install packed SDK for source checks
-        if: github.event_name != 'workflow_dispatch'
-        working-directory: packages/${{ matrix.plugin }}
-        run: |
-          # shortcut: model types ship in the next SDK release; use the pinned API until then.
-          (cd "$GODWIT_CHECKOUT/sdk" && bun pm pack --ignore-scripts --filename "$RUNNER_TEMP/godwit-sdk.tgz")
-          bun add --dev --no-save --ignore-scripts "@godwit/sdk@file:$RUNNER_TEMP/godwit-sdk.tgz"
       - run: bun run --bun typecheck
         working-directory: packages/${{ matrix.plugin }}
       - run: bun test scripts

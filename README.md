@@ -85,23 +85,20 @@ Each `packages/<name>/` contains `plugin.json` and `package.json`, whose scripts
 write `dist/plugin.json` and a bundled `dist/index.js`. New packages join the shared CI
 without adding a workflow.
 
-1. Release Godwit 1.7.0 or later with model plugin support; its release publishes the matching
-   `@godwit/sdk` version. The published 1.6.0 SDK predates the model API.
-2. Bump `packages/<name>/package.json` and `plugin.json` together and merge to main.
-3. Create and push `<name>-vX.Y.Z` for that main commit.
-4. Run **Actions → Plugins → Run workflow** on main, supplying the plugin name, tag, and actual
+1. Bump `packages/<name>/package.json` and `plugin.json` together and merge to main.
+2. Create and push `<name>-vX.Y.Z` for that main commit.
+3. Run **Actions → Plugins → Run workflow** on main, supplying the plugin name, tag, and actual
    minimum released Godwit version. The workflow checks the tagged source, installs the
    published SDK, and publishes `index.js`, `plugin.json`, `<name>.tar.gz`,
    `registry-plugin.json`, and `SHA256SUMS` to GitHub Releases.
-5. Copy the release from the released `registry-plugin.json` into the plugin's
+4. Copy the release from the released `registry-plugin.json` into the plugin's
    `packages/<name>/godwit-plugin.json`, preserving older releases, and merge it. Then open a PR
    that sets the plugin's `source.sha` in `directory.json` to that commit (a new plugin: adds its
    entry, whose title, summary and risk wording are the reviewers'). **Publish** builds the
    registry, validates the real downloads, signs, and uploads it.
 
-PR checks provide a `<name>-dist` artifact. Until the model API's SDK is published, they
-pack it from the pinned Godwit commit used by the goja integration test. Release runs
-install the published SDK from npm. Update the host pin when updating the SDK/API.
+PR checks provide a `<name>-dist` artifact. Checks and release runs install the published SDK
+from npm and test against the pinned Godwit commit. Update the pin when updating the SDK/API.
 Release runs require `contents: write`. If a failed run leaves a draft release, inspect
 and delete that unpublished draft before retrying. Never replace published files; bump
 the version instead. The workflow does not modify the registry.
