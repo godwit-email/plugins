@@ -1,0 +1,42 @@
+{
+  "plugins": [
+    {
+      "category": "translate",
+      "dataFlow": "third-party",
+      "homepage": "https://github.com/godwit-email/plugin-dlx",
+      "name": "dlx",
+      "publisher": "Godwit 社区",
+      "source": {
+        "path": "godwit-plugin.json",
+        "repo": "godwit-email/plugin-dlx",
+        "sha": "717b83825d632667bffa7207813533458e10b029"
+      },
+      "summary": {
+        "default": "Translates mail and selected text, with nothing to set up. The text goes to a third-party translation service through an unofficial interface, which may be rate limited or stop working.",
+        "zh-CN": "翻译邮件与选中文本，无需设置。文本会通过非官方接口发送到第三方翻译服务，可能被限流或失效。"
+      },
+      "title": {
+        "default": "DLX"
+      }
+    },
+    {
+      "category": "models",
+      "dataFlow": "local",
+      "homepage": "https://github.com/godwit-email/plugin-startlux",
+      "name": "startlux",
+      "publisher": "Godwit",
+      "source": {
+        "path": "godwit-plugin.json",
+        "repo": "godwit-email/plugin-startlux",
+        "sha": "36d8e2e879717a3f66e74fb994ad375f4dda612d"
+      },
+      "summary": {
+        "default": "Local judge models: label mail and answer yes/no questions on this computer, with no mail sent anywhere. Downloads a 2–2.7 GB model when you choose it; on computers without Apple silicon it is slow and best for new mail only.",
+        "zh-CN": "本地判断模型：在本机给邮件打标签、回答是非题，邮件内容不发往任何地方。选用时下载 2–2.7 GB 的模型；非 Apple 芯片的电脑上较慢，建议只给新邮件打标签。"
+      },
+      "title": {
+        "default": "StartLux"
+      }
+    }
+  ]
+}
