@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/MoeForge/moejs"
 	"github.com/godwit-email/godwit/core/plugins"
 	"github.com/stretchr/testify/require"
 )
@@ -43,9 +43,10 @@ func TestZenFree(t *testing.T) {
 	require.NoError(t, err)
 	code, err := plugins.Build(dist, m.Main)
 	require.NoError(t, err)
-	program, err := goja.Compile("zen-free", string(code), true)
+	mod, err := moejs.Compile("zen-free.js", string(code))
 	require.NoError(t, err)
-	vm := plugins.NewVM("zen-free", program, plugins.VMOptions{})
+	vm, err := plugins.NewVM("zen-free", mod, plugins.VMOptions{})
+	require.NoError(t, err)
 	t.Cleanup(vm.Close)
 	cfg := &plugins.ConfigSnapshot{Values: map[string]any{}}
 	p, err := plugins.Load(context.Background(), vm, m, catalogHost{}, cfg)

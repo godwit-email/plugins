@@ -1,19 +1,21 @@
 # Zen Free for Godwit
 
-在 Godwit 中使用 OpenCode Zen 的免费模型，无需 API Key。
+Use OpenCode Zen's free models in Godwit, with no API key.
 
-## 使用
+[简体中文](README.zh-Hans.md)
 
-插件尚未发布。发布并收录后：
+## Use
 
-1. 打开 Godwit「设置 → 扩展」，在插件目录中安装 Zen Free。
-2. 启用插件，允许它声明的网络权限。
-3. 打开「设置 → 模型服务」，选择 Zen Free 的模型。
+The plugin is not released yet. Once it is listed:
 
-可用模型由上游免费目录决定，无需手动配置接口或协议。需要支持模型插件的 Godwit 版本。
+1. Open Godwit **Settings → Extensions** and install Zen Free from the plugin directory.
+2. Enable the plugin and allow the network access it declares.
+3. Open **Settings → Model Services** and choose a Zen Free model.
 
-## 数据与可用性
+The available models follow the upstream free catalog; there is no endpoint or protocol to set up.
 
-使用模型时，提示、邮件上下文、工具定义及工具结果会发送到 OpenCode 及其模型服务商，请阅读上游的数据使用条款。
+## Data and availability
 
-插件依赖非官方公共接口。免费模型、限流和免费期限可能变化，不保证配额或持续可用。
+When you use a model, prompts, mail context, tool definitions and tool results are sent to OpenCode and its model providers. Read their data terms before using it with mail you care about.
+
+The plugin relies on an unofficial public interface and identifies itself to it as the OpenCode client. Free models, rate limits and free periods can change, and neither quota nor continued availability is guaranteed.
