@@ -5,7 +5,7 @@
       "dataFlow": "third-party",
       "homepage": "https://github.com/godwit-email/plugin-dlx",
       "name": "dlx",
-      "publisher": "Godwit 社区",
+      "publisher": "Godwit Community",
       "source": {
         "path": "godwit-plugin.json",
         "repo": "godwit-email/plugin-dlx",
