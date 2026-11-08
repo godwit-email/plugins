@@ -37,6 +37,25 @@
       "title": {
         "default": "StartLux"
       }
+    },
+    {
+      "category": "models",
+      "dataFlow": "third-party",
+      "homepage": "https://github.com/godwit-email/plugin-antigravity",
+      "name": "antigravity",
+      "publisher": "Godwit",
+      "source": {
+        "path": "godwit-plugin.json",
+        "repo": "godwit-email/plugin-antigravity",
+        "sha": "3e1d112f518ee5ccb9d1e48e3aec35b2dfd36cf6"
+      },
+      "summary": {
+        "default": "Use Gemini through your Google Antigravity sign-in. Unofficial and against Antigravity's terms, which forbid third-party access: Google may suspend your Antigravity and Gemini CLI access. Mail you send to these models goes to Google, which stores it and whose reviewers may read it. macOS only; downloads Google's server (about 100 MB) when you sign in. A Gemini API key under Models is the supported way.",
+        "zh-Hans": "用 Google Antigravity 登录使用 Gemini。非官方，违反 Antigravity 条款（条款禁止第三方访问），Google 可能暂停你的 Antigravity 和 Gemini CLI 使用权。发给这些模型的邮件会发往 Google，由其存储，审核人员可能查看。仅限 macOS，登录时下载 Google 的服务程序（约 100 MB）。受支持的做法是在模型设置里使用 Gemini API key。"
+      },
+      "title": {
+        "default": "Antigravity"
+      }
     }
   ]
 }
